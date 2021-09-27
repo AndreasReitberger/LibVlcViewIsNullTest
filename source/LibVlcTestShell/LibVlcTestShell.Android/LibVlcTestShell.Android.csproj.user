@@ -3,5 +3,6 @@
   <PropertyGroup>
     <SelectedDevice>HUAWEI STF-L09</SelectedDevice>
     <ActiveDebugProfile>HUAWEI STF-L09</ActiveDebugProfile>
+    <DefaultDevice>pixel_3a_r_11_0_-_api_30</DefaultDevice>
   </PropertyGroup>
 </Project>

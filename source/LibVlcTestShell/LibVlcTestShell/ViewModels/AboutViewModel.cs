@@ -15,8 +15,19 @@ namespace LibVlcTestShell.ViewModels
         {
             Title = "About";
             OpenWebCommand = new Command(async () => await Browser.OpenAsync("https://aka.ms/xamarin-quickstart"));
+            RestartWebCamCommand = new Command(async () => await RestartWebCamAction());
         }
 
+        private bool _isStartup = true;
+
+        /// <summary>
+        /// Gets the <see cref="LibVLCSharp.Shared.LibVLC"/> instance.
+        /// </summary>
+        public bool IsStartup
+        {
+            get => _isStartup;
+            private set => SetProperty(ref _isStartup, value, nameof(IsStartup));
+        }
         private LibVLC _libVLC;
 
         /// <summary>
@@ -80,24 +91,30 @@ namespace LibVlcTestShell.ViewModels
 
         public ICommand OpenWebCommand { get; }
 
+        public ICommand RestartWebCamCommand { get; set; }
+        async Task RestartWebCamAction()
+        {
+            StopWebCamViewAction();
+            await Task.Delay(10);
+            await RefreshWebCamViewAction();
+            await Task.Delay(100);
+            StartWebCamViewAction();
+        }
+
         public async Task OnAppearing()
         {
             try
             {
-                DoneLoading = false;
-                //Core.Initialize();
-                await RefreshWebCamViewAction();
-                await Task.Delay(100);
+                if (IsStartup)
+                {
+                    DoneLoading = false;
+                    //Core.Initialize();
+                    await RefreshWebCamViewAction();
+                    await Task.Delay(100);
+                    IsStartup = false;
+                }
                 StartWebCamViewAction();
-                /*
-                LibVLC = new LibVLC(enableDebugLogs: true);
 
-                Media media = new Media(LibVLC, new Uri("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"));
-
-                MediaPlayer = new MediaPlayer(media) { EnableHardwareDecoding = true };
-                media.Dispose();
-                _ = MediaPlayer.Play();
-                */
                 DoneLoading = true;
             }
             catch (Exception exc)
@@ -109,8 +126,6 @@ namespace LibVlcTestShell.ViewModels
                     );
             }
         }
-
-
 
         internal void OnDisappearing()
         {
